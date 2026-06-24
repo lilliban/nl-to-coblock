@@ -1,4 +1,4 @@
-from prompt_builder import PromptBuilder
+from src.knowledge_base.prompt_builder import PromptBuilder
 
 class RuleGenerator:
 

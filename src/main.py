@@ -1,10 +1,10 @@
 import os
-from rule_generator import RuleGenerator
-from llm_factory import LLMFactory
+from src.knowledge_base.rule_generator import RuleGenerator
+from src.connection.llm_factory import LLMFactory
 
 # Insert API KEY
 PROVIDER = "gemini"
-API_KEY = os.getenv("GEMINI_API_KEY", "..........")
+API_KEY = os.getenv("GEMINI_API_KEY", ".........")
 MODEL = "gemini-2.5-flash"
 
 REQUIREMENTS = [

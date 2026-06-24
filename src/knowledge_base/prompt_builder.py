@@ -1,4 +1,4 @@
-from coblock_syntax import COBLOCK_DOCS, COBLOCK_EXAMPLES
+from src.knowledge_base.coblock_syntax import COBLOCK_DOCS, COBLOCK_EXAMPLES
 
 class PromptBuilder:
 
