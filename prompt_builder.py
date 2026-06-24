@@ -14,8 +14,7 @@ class PromptBuilder:
             prompt += f"CoBlock rule: {esempio['rule']}\n\n"
 
         prompt += f"Natural language: \"{frase_utente}\"\n"
-        #convezione del prompt enginering, perchè permette di capire agli LLM dove scrivere la risposta
-        prompt += "CoBlock rule:"
 
+        prompt += "CoBlock rule:"
 
         return prompt

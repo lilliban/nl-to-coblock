@@ -1,54 +1,100 @@
-#come convenzione si mette prima la documentazione, poi gli esempi
-
-#SI POTREBBE VEDERE COME CAMBIANDO IL PROMPT VA A CAMBIARE L'OUTPUT E SCRIVERLO NEL PAPER
 COBLOCK_DOCS = """
-CoBlock is a domain-specific language designed to write compliance and 
-security rules for blockchain systems. It is built on two pillars: 
-transactions and filters.
+CoBlock: Domain-Specific Language for Compliance Checking on Smart Contract Execution Data
 
-TRANSACTIONS (TX)
-A transaction represents the execution of a specific operation or function 
-within a smart contract. It contains precise data that can be checked, such 
-as: who sent the money, which function was triggered, which block it belongs 
-to, and how much gas it consumed.
+RULE STRUCTURE
 
-Syntax:
-  name(filters) control_flow
+RULE ::= TX (control_flow_operator) [TI] TX
+       | TX (unary_operator)
+
+A rule consists of one or more transactions (TX) connected by control-flow 
+constructs.
+
+TRANSACTION (TX)
+
+TX ::= identifier ( [FIELD] [ATTR]* )
+
+identifier ::= [a-zA-Z][a-zA-Z0-9]* 
+
+A transaction represents the execution of a specific operation within a smart 
+contract. It can be enriched with filters (FIELD) and attributes (ATTR).
 
 FILTERS (FIELD)
-Filters are optional criteria you can add when defining a transaction to 
-check. If a filter is not included, it means there is no constraint on that 
-specific data. Available filters:
-  contract  : filter by the smart contract address where the action occurs
-  sender    : filter by the address that initiated the transaction
-  function  : filter by the name of the executed function
-  block     : filter by the blockchain block number
-  timestamp : filter by the exact moment (UNIX time) the action occurred
-  gas       : filter by gas consumption (e.g. gas > 4000000)
 
-UNARY CONTROL FLOW (one transaction)
-The presence or absence of a single transaction is verified using:
-  occ  → the transaction MUST be present. 
-         If not found, the rule is violated.
-  nocc → the transaction must NEVER be present. 
-         If found, the rule is violated.
+FIELD ::= contract (OP) address
+        | sender (OP) address
+        | function (OP) function_name
+        | block (COMP) value
+        | timestamp (COMP) value
+        | gas (COMP) value
 
-BINARY CONTROL FLOW (two transactions)
-Two transactions can be linked using binary constructs, defining time or 
-order relations between them. A time interval (TI) is always associated, 
-expressed in seconds or number of mined blocks:
-  ef  (eventually follows)        : B must happen after A, within the time limit
-  df  (directly follows)          : B must happen immediately after A, with no 
-                                    other transactions in between
-  nef (never eventually follows)  : B must never appear after A
-  ndf (never directly follows)    : B must never appear immediately after A
+OP ::= is | is not
+COMP ::= = | != | < | <= | > | >=
 
-Time interval examples:
-  ef < 864000 seconds
-  nef > 0 blocks
+address       ::= 0x[A-Fa-f0-9]+
+function_name ::= [a-zA-Z][a-zA-Z0-9]*
+value         ::= number | string | ... 
+
+Filters are optional. If omitted, no constraint is applied on that field.
+
+TRANSACTION ATTRIBUTES (ATTR)
+
+ATTR ::= is updated SV (COMP) value
+       | is passed I (COMP) value
+       | is called CALL
+       | is emitted E
+
+SV ::= identifier
+I  ::= identifier
+CALL ::= contract (OP) address [with I (COMP) value]*
+E ::= event_name [is contained ED (COMP) value]*
+
+ED ::= identifier
+event_name ::= [a-zA-Z][a-zA-Z0-9]*
+
+Attributes enable fine-grained checks on transaction internals.
+
+CROSS-TRANSACTION REFERENCES (DOT NOTATION)
+
+DOT_REFERENCE ::= TX_identifier.field
+
+Example:
+  createTX.designatedReporter
+  createTX.timestamp
+  createTX.BOND 
+
+Dot notation allows referencing data from previous transactions.
+
+EXPRESSIONS IN TI
+
+TI_expr ::= value | TX_identifier.field | (TI_expr OP TI_expr)
+
+Example:
+  (createTX.endTime - createTX.timestamp) + 86400
+
+CONTROL FLOW
+
+UNARY (single transaction):
+  occ   → The transaction MUST be present. If not found, the rule is violated.
+  nocc  → The transaction MUST NEVER be present. If found, the rule is violated.
+
+BINARY (two transactions):
+  ef   (eventually follows)        : B must occur after A, within the time limit
+  df   (directly follows)          : B must occur immediately after A, 
+                                      with no other transactions in between
+  nef  (never eventually follows)  : B must never occur after A
+  ndf  (never directly follows)    : B must never occur immediately after A
+
+Transaction Interval (TI) - required for binary constructs:
+  < value seconds | blocks   → within the specified limit
+  > value seconds | blocks   → beyond the specified limit
+
+TI can be specified as:
+  - Absolute value: 864000 seconds
+  - Absolute value: 10 blocks
+  - Expression: (createTX.endTime - createTX.timestamp) + 86400 seconds
+
 """
 
-#DA CAPIRE QUALI ESEMPI DARE, TROVARNE DEI MIGLIORI O COMUNQUE PROVARNE ALTRI
 COBLOCK_EXAMPLES = [
     {
         "nl": "Markets should be resolved with the proper reward. Traders must claim their proceeds in each market",

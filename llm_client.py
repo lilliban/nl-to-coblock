@@ -1,9 +1,6 @@
-# va a definire i vari client LLM, per ora abbiamo GeminiClient, OpenAIClient, MockClient
 from abc import ABC, abstractmethod
 
-
 class LLMClient(ABC):
-    """Classe base astratta — Strategy Pattern. Tutti i client devono implementare generate()."""
 
     @abstractmethod
     def generate(self, prompt: str) -> str:
@@ -15,12 +12,6 @@ class LLMClient(ABC):
 
 
 class GeminiClient(LLMClient):
-    """
-    Client per Google Gemini API (gratuito con piano base).
-    Documentazione: ai.google.dev/gemini-api/docs
-    API key: aistudio.google.com
-    Installazione: pip install google-genai
-    """
 
     def __init__(self, api_key: str, model: str = "gemini-2.5-flash"):
         self.api_key = api_key
@@ -37,12 +28,6 @@ class GeminiClient(LLMClient):
 
 
 class OpenAIClient(LLMClient):
-    """
-    Client per OpenAI API (GPT-4o-mini, GPT-4o, ecc.)
-    Documentazione: platform.openai.com/docs
-    API key: platform.openai.com/api-keys
-    Installazione: pip install openai
-    """
 
     def __init__(self, api_key: str, model: str = "gpt-4o-mini"):
         self.api_key = api_key
@@ -64,11 +49,6 @@ class OpenAIClient(LLMClient):
 
 
 class MockClient(LLMClient):
-    """
-    Client finto per testare il pipeline senza API key.
-    Restituisce una regola CoBlock generica per qualsiasi input.
-    Utile per verificare che il pipeline funzioni end-to-end.
-    """
 
     def generate(self, prompt: str) -> str:
         return "createTX(function is CreateMarket) occ"

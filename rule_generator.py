@@ -1,5 +1,5 @@
 from prompt_builder import PromptBuilder
-#controller
+
 class RuleGenerator:
 
     def __init__(self, llm_client):
@@ -7,11 +7,11 @@ class RuleGenerator:
         self.builder = PromptBuilder()
 
     def generate(self, frase_utente):
-        # 1. costruisci il prompt
+        #build prompt
         prompt = self.builder.build(frase_utente)
-        # 2. manda il prompt all'LLM
+        #send to LLM
         risposta = self.llm_client.generate(prompt)
-        # 3. restituisci la risposta
+
         return risposta
 
 

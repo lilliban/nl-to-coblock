@@ -2,21 +2,19 @@ import os
 from rule_generator import RuleGenerator
 from llm_factory import LLMFactory
 
+# Insert API KEY
 PROVIDER = "gemini"
-#se lo volete fa parti dovete mette la vostra chiave al posto dei puntini
 API_KEY = os.getenv("GEMINI_API_KEY", "..........")
 MODEL = "gemini-2.5-flash"
 
-#frasi nel linguaggio naturale
 REQUIREMENTS = [
     # CR3
-    "The initial reporter must get properly rewarded",
+    "Check that the initial reporter (who stakes REP to validate an outcome) gets properly rewarded",
     # CR6
-    "The end betting event date must not be earlier than the market creation date",
+    "Allow anyone to create a market about any upcoming event",
     # CR7
-    "The creation bond is returned to the market creator only if the designated reporter reports within 24 hours after the market end time",
+    "The creation bond, paid in REP, is returned to the market creator if  and only if the market’s designated reporter actually reports during the first 24 hours after the market’s event end time.",
 ]
-
 
 if __name__ == "__main__":
 
@@ -24,7 +22,6 @@ if __name__ == "__main__":
     generator = RuleGenerator(client)
 
     print(f"Provider: {client}")
-
 
     for frase in REQUIREMENTS:
         print(f"\nInput:  {frase}")
