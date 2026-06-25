@@ -1,4 +1,3 @@
-#grammatica + esempi di CoBlock
 COBLOCK_DOCS = """
 CoBlock: Domain-Specific Language for Compliance Checking on Smart Contract Execution Data
 
@@ -33,7 +32,7 @@ COMP ::= = | != | < | <= | > | >=
 
 address       ::= 0x[A-Fa-f0-9]+
 function_name ::= [a-zA-Z][a-zA-Z0-9]*
-value         ::= number | string | identifier.field
+value         ::= number | string | ...
 
 Filters are optional. If omitted, no constraint is applied on that field.
 
@@ -62,9 +61,7 @@ Examples:
   createTX.sender           -- sender field of createTX
   createTX.BOND             -- custom field BOND of createTX
   createTX.designatedReporter
-  transOwnTX.sender
-  transOwnTX.inputs.newOwner
-  
+
 Dot notation allows referencing data from other transactions within the same rule.
 It can be used in FIELD values, ATTR values, and TI expressions.
 
@@ -131,28 +128,8 @@ COBLOCK_EXAMPLES = [
         "rule": "finalizeTX(function is FinalizeMarket)\nef < 864000 seconds\ncreateTX(function is CreateMarket)"
     },
 
-     {
-        "nl": "The creation bond is returned to the market creator only if the designated reporter submits the report within 24 hours after the market end time, with the correct recipient and amount.",
-        "rule": "reportTX(sender is createTX.designatedRepoter\n    function is SubmitInitialReport\n    is emitted Transfer(is contained to (= createTX.sender)\n    is contained value (= createTX.BOND)))\nef < (createTX.endTime - createTX.timestamp) + 86400 seconds\ncreateTX(contract is 0x7677 function is CreateMarket)"
-    }, 
-    
-    #  PANCAKESWAP 
     {
-        "nl": "A contract ownership transfer is only valid if it emits the OwnershipTransferred event with the correct previous owner, provides a non-null new owner input, and updates the owner state variable.",
-        "rule": "transOwnTX(function is transferOwnership\n    is passed newOwner(!= nil)\n    is updated _owner(!= transOwnTX.inputs.newOwner)\n    is emitted OwnershipTransferred(is contained previousOwner(!= transOwnTX.sender))) nocc"
-    },
- 
-    {
-        "nl": "Every token transfer across chains must make the required call to the LayerZero protocol contract at address 0xd675 to handle cross-chain communication.",
-        "rule": "transTokTX(function is sendFrom\n    is called STATICCALL(contract is not 00000000000000000000000066a71dcef29a0ffbdbe3c6a460a3b5bc225cd675)) nocc"
-    },
- 
-    # BEANSTALK 
- 
-    {
-        "nl": "Governance improvement proposal votes should not be manipulated. A transaction must not combine a flash loan with a governance vote, as this indicates possible attack behavior.",
-        "rule": "voteTX(\n    is called vote()\n    is emitted FlashLoan()) occ"
-    }  
-    
-    
+        "nl": "The settlement is valid only if the designated reporter submits the report with a Transfer event containing the correct recipient and bond amount, within 24 hours after the market end time",
+        "rule": "reportTX(sender is createTX.designatedReporter\n    function is SubmitReport\n    is emitted Transfer(is contained to (= createTX.sender)\n    is contained value (= createTX.BOND)))\nef < (createTX.endTime - createTX.timestamp) + 86400 seconds\ncreateTX(contract is 0x7677 function is CreateMarket)"
+    }
 ]

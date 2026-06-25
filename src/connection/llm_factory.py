@@ -1,4 +1,4 @@
-from connection.llm_client import GeminiClient, OpenAIClient, MockClient
+from src.connection.llm_client import GeminiClient, OpenAIClient, MockClient
 
 class LLMFactory:
 
