@@ -97,37 +97,30 @@ TI can be specified as:
 """
 
 COBLOCK_EXAMPLES = [
-
     {
         "nl": "Markets should be resolved with the proper reward. Traders must claim their proceeds in each market",
         "rule": "claimTX(function is ClaimTradingProceeds) nocc"
     },
-
     {
         "nl": "Avoid excessive fees that could discourage market creation. Maximum 4,000,000 gas units",
         "rule": "createTX(function is CreateMarket\n    gas > 4000000) occ"
     },
-
     {
         "nl": "All markets should be instantiated by the in-charge smart contract 0x7677 to guarantee correct flow",
         "rule": "createTX(contract is not 0x7677\n    function is CreateMarket) occ"
     },
-
     {
         "nl": "The initial reporter must get properly rewarded",
         "rule": "redeemInitRepTX(function is RedeemAsInitialReporter)\nnef > 0 blocks\nfinalizeTX(function is FinalizeMarket)"
     },
-
     {
         "nl": "A market must not be created with an end time earlier than the current transaction timestamp. The end time is passed as input parameter.",
         "rule": "createTX(function is CreateMarket\n    is passed endTime (< createTX.timestamp)) nocc"
     },
-
     {
         "nl": "Markets should have a reasonable duration. Check for a time frame too close between market creation and finalization — 10 days",
         "rule": "finalizeTX(function is FinalizeMarket)\nef < 864000 seconds\ncreateTX(function is CreateMarket)"
     },
-
     {
         "nl": "The settlement is valid only if the designated reporter submits the report with a Transfer event containing the correct recipient and bond amount, within 24 hours after the market end time",
         "rule": "reportTX(sender is createTX.designatedReporter\n    function is SubmitReport\n    is emitted Transfer(is contained to (= createTX.sender)\n    is contained value (= createTX.BOND)))\nef < (createTX.endTime - createTX.timestamp) + 86400 seconds\ncreateTX(contract is 0x7677 function is CreateMarket)"
